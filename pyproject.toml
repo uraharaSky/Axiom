@@ -1,0 +1,159 @@
+# ============================================================
+# AXIOM - Python Project Configuration
+# ============================================================
+#
+# This file defines how AXIOM is built, installed, and exposed
+# as a Python package.
+#
+# AXIOM will eventually become a reusable CLI tool that can be
+# installed into different projects and used to discover,
+# generate, execute, and evolve automated tests.
+#
+# ============================================================
+
+
+# ------------------------------------------------------------
+# BUILD SYSTEM
+# ------------------------------------------------------------
+#
+# Tells Python which tools are responsible for building and
+# installing AXIOM.
+#
+# setuptools is currently our build backend.
+#
+# Later, this section generally won't need much modification.
+# ------------------------------------------------------------
+
+[build-system]
+
+requires = [
+    "setuptools>=68"
+]
+
+build-backend = "setuptools.build_meta"
+
+
+# ------------------------------------------------------------
+# PROJECT METADATA
+# ------------------------------------------------------------
+#
+# Basic information about AXIOM as a Python package.
+# ------------------------------------------------------------
+
+[project]
+
+# Package name.
+# This is what identifies AXIOM to Python's package ecosystem.
+name = "axiom"
+
+# Current AXIOM version.
+#
+# We are starting at 0.1.0 because this is an early development
+# version rather than a production release.
+version = "0.1.0"
+
+# Short description shown by package managers and tooling.
+description = "AI-powered autonomous testing engine."
+
+# AXIOM requires modern Python.
+requires-python = ">=3.12"
+
+
+# ------------------------------------------------------------
+# RUNTIME DEPENDENCIES
+# ------------------------------------------------------------
+#
+# Libraries AXIOM needs in order to run.
+#
+# Typer -> command-line interface
+# Rich  -> terminal UI / formatting / tables / progress
+#
+# More dependencies will be added as AXIOM grows.
+#
+# Examples we may eventually add:
+#
+#   FastAPI inspection tools
+#   Pydantic
+#   HTTPX
+#   Pytest
+#   Ollama client
+#
+# But we deliberately don't add everything now.
+# ------------------------------------------------------------
+
+dependencies = [
+    "typer",
+    "rich",
+]
+
+
+# ------------------------------------------------------------
+# COMMAND-LINE ENTRY POINT
+# ------------------------------------------------------------
+#
+# This is what allows us to type:
+#
+#     axiom
+#
+# directly in the terminal instead of:
+#
+#     python src/axiom/cli.py
+#
+# The format is:
+#
+#     command = "python_module:function"
+#
+# Therefore:
+#
+#     axiom = "axiom.cli:app"
+#
+# means:
+#
+#     Run the `app` object from `axiom/cli.py`.
+# ------------------------------------------------------------
+
+[project.scripts]
+
+axiom = "axiom.cli:app"
+
+
+# ------------------------------------------------------------
+# PACKAGE DISCOVERY
+# ------------------------------------------------------------
+#
+# AXIOM uses the "src layout":
+#
+#     src/
+#       axiom/
+#
+# This tells setuptools to look inside `src` for Python
+# packages.
+#
+# Without this, setuptools may not automatically know where
+# our actual AXIOM package lives.
+# ------------------------------------------------------------
+
+[tool.setuptools.packages.find]
+
+where = ["src"]
+
+
+# ============================================================
+# FUTURE AXIOM CONFIGURATION
+# ============================================================
+#
+# As AXIOM grows, this file may eventually contain development
+# and tooling configuration such as:
+#
+#   [tool.pytest.ini_options]
+#   [tool.ruff]
+#   [tool.mypy]
+#
+# However, we will add those when we actually need them.
+#
+# The important principle:
+#
+# pyproject.toml = project/tool configuration
+# Python files   = AXIOM application logic
+#
+# ============================================================
