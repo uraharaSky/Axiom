@@ -1,23 +1,29 @@
 import typer
 
+from axiom.ui.welcome import show_welcome
+
+
 app = typer.Typer(
     name="axiom",
     help="AI-powered autonomous testing engine.",
-    no_args_is_help=True,
+    no_args_is_help=False,
 )
 
 
-@app.callback()
-def main():
+@app.callback(invoke_without_command=True)
+def main(ctx: typer.Context) -> None:
     """
-    AXIOM — AI-powered autonomous testing engine.
+    AXIOM — Autonomous Testing Intelligence.
     """
-    pass
+
+    if ctx.invoked_subcommand is None:
+        show_welcome()
 
 
 @app.command()
-def version():
+def version() -> None:
     """Show AXIOM version."""
+
     typer.echo("AXIOM v0.1.0")
 
 
