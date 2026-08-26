@@ -5,41 +5,50 @@ from rich.style import Style
 from rich.text import Text
 
 
-# AXIOM mascot asset.
-# Place the image at:
-# src/axiom/ui/assets/byte.png
+# ---------------------------------------------------------
+# Byte — AXIOM mascot
+# ---------------------------------------------------------
+
 ASSET_PATH = Path(__file__).parent / "assets" / "axiom_cat_mascot.png"
 
-# Terminal character cells are taller than they are wide.
-# This keeps Byte's proportions visually balanced.
-PIXEL_ASPECT_RATIO = 0.95
+# Byte uses one solid terminal color.
+BYTE_COLOR = "#2EDCC6"
 
-# Alpha threshold used to decide whether a pixel belongs to Byte.
+# Ignore extremely faint transparent pixels.
 ALPHA_THRESHOLD = 40
 
+# Terminal characters are taller than they are wide.
+PIXEL_ASPECT_RATIO = 0.95
 
-def render_byte(width: int = 32) -> Text:
+
+def render_byte(width: int = 20) -> Text:
     """
-    Render Byte, the AXIOM mascot, as terminal-friendly pixel art.
+    Render Byte as terminal-friendly pixel art.
 
-    The source image is converted into Unicode half-block characters:
-        ▀  top half
-        ▄  bottom half
+    The PNG is treated as a binary mask:
+        visible pixel     -> AXIOM mint
+        transparent pixel -> terminal background
 
-    Two vertical image pixels are represented by one terminal
-    character cell while preserving transparency.
+    Two vertical image pixels are represented by one Unicode
+    half-block character.
     """
 
     image = Image.open(ASSET_PATH).convert("RGBA")
 
-    # Remove unused transparent space around Byte.
+    # -----------------------------------------------------
+    # Crop transparent padding
+    # -----------------------------------------------------
+
     alpha = image.getchannel("A")
     bbox = alpha.getbbox()
 
     if bbox:
         image = image.crop(bbox)
 
-    # Compensate for the non-square shape of terminal characters.
+    # -----------------------------------------------------
+    # Resize for terminal character proportions
+    # -----------------------------------------------------
+
     height = max(
         2,
         int(
@@ -57,8 +66,14 @@ def render_byte(width: int = 32) -> Text:
 
     result = Text()
 
+    # -----------------------------------------------------
+    # Convert image pixels → Unicode half blocks
+    # -----------------------------------------------------
+
     for y in range(0, height, 2):
+
         for x in range(width):
+
             top = image.getpixel((x, y))
 
             if y + 1 < height:
@@ -66,28 +81,25 @@ def render_byte(width: int = 32) -> Text:
             else:
                 bottom = (0, 0, 0, 0)
 
-            top_visible = top[3] > ALPHA_THRESHOLD
-            bottom_visible = bottom[3] > ALPHA_THRESHOLD
+            top_visible = _is_byte_pixel(top)
+            bottom_visible = _is_byte_pixel(bottom)
 
             if top_visible and bottom_visible:
                 result.append(
-                    "▀",
-                    style=Style(
-                        color=_rgb(top),
-                        bgcolor=_rgb(bottom),
-                    ),
+                    "█",
+                    style=Style(color=BYTE_COLOR),
                 )
 
             elif top_visible:
                 result.append(
                     "▀",
-                    style=Style(color=_rgb(top)),
+                    style=Style(color=BYTE_COLOR),
                 )
 
             elif bottom_visible:
                 result.append(
                     "▄",
-                    style=Style(color=_rgb(bottom)),
+                    style=Style(color=BYTE_COLOR),
                 )
 
             else:
@@ -97,9 +109,18 @@ def render_byte(width: int = 32) -> Text:
 
     return result
 
+def _is_byte_pixel(pixel: tuple[int, int, int, int]) -> bool:
+    """
+    Determine whether a pixel belongs to Byte.
 
-def _rgb(pixel: tuple[int, int, int, int]) -> str:
-    """Convert an RGBA pixel into a Rich-compatible RGB color."""
+    Byte is a single-color mascot, so dark pixels such as the
+    eyes are treated as transparent cutouts.
+    """
 
-    r, g, b, _ = pixel
-    return f"#{r:02x}{g:02x}{b:02x}"
+    r, g, b, a = pixel
+
+    if a <= ALPHA_THRESHOLD:
+        return False
+
+    # Ignore black/dark pixels used for Byte's eyes.
+    return max(r, g, b) > 80

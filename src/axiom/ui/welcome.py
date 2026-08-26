@@ -62,7 +62,7 @@ def show_welcome() -> None:
     )
 
     mascot = Align(
-        render_byte(width=32),
+        render_byte(width=24),
         vertical="middle",
         # horizontal="left",
         # pad=(3, 0),
