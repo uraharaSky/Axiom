@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-from axiom.scanner.models import Route
+from axiom.scanner.models import Route, Parameter
 
 
 def parse_python_file(path: Path) -> ast.AST:
@@ -45,6 +45,21 @@ def discover_routes(
             if not isinstance(path_node.value, str):
                 continue
 
+            parameters = []
+
+            for argument in node.args.args:
+                parameter_type = None
+
+                if isinstance(argument.annotation, ast.Name):
+                    parameter_type = argument.annotation.id
+
+                parameters.append(
+                    Parameter(
+                        name=argument.arg,
+                        type=parameter_type,
+                    )
+                )
+
             routes.append(
                 Route(
                 method = method,
@@ -52,6 +67,7 @@ def discover_routes(
                 function = node.name,
                 file = file,
                 line = node.lineno,
+                parameters=parameters,
                 )
             )
 
