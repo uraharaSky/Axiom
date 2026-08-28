@@ -18,6 +18,19 @@ def parse_python_file(path: Path) -> ast.AST:
 
     return tree
 
+def get_annotation_name(
+        annotation: ast.expr | None,
+) -> str | None :
+
+        if annotation is None:
+            return None
+
+        if isinstance(annotation, ast.Name):
+            return annotation.id
+
+        return None
+
+
 def discover_routes(
         tree: ast.AST,
         file: Path,
@@ -48,10 +61,9 @@ def discover_routes(
             parameters = []
 
             for argument in node.args.args:
-                parameter_type = None
-
-                if isinstance(argument.annotation, ast.Name):
-                    parameter_type = argument.annotation.id
+                parameter_type = get_annotation_name(
+                    argument.annotation
+                )
 
                 parameters.append(
                     Parameter(
