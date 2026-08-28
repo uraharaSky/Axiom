@@ -1,5 +1,4 @@
 from rich.tree import Tree
-
 from axiom.scanner.models import SourceFile, Route
 
 
