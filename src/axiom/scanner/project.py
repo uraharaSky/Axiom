@@ -1,5 +1,9 @@
 from pathlib import Path
 from axiom.scanner.models import SourceFile, Project
+from axiom.scanner.python_ast import (
+    discover_routes,
+    parse_python_file,
+)
 
 SUPPORTED_EXTENSIONS = {
     ".py": "python",
@@ -52,3 +56,22 @@ def scan_project(root : Path)-> Project:
         files = files,
         language = language,
     )
+
+def project_parse(project: Project) -> Project:
+    for source_file in project.files:
+
+        if source_file.language != "python":
+            continue
+
+        tree = parse_python_file(
+            source_file.path
+        )
+
+        routes = discover_routes(
+            tree,
+            source_file.path,
+        )
+
+        project.routes.extend(routes)
+
+    return project
