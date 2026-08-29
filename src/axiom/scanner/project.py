@@ -3,6 +3,7 @@ from axiom.scanner.models import SourceFile, Project
 from axiom.scanner.python_ast import (
     discover_routes,
     parse_python_file,
+    discover_functions,
 )
 
 SUPPORTED_EXTENSIONS = {
@@ -72,6 +73,12 @@ def project_parse(project: Project) -> Project:
             source_file.path,
         )
 
+        functions = discover_functions(
+            tree,
+            source_file.path,
+        )
+
         project.routes.extend(routes)
+        project.functions.extend(functions)
 
     return project

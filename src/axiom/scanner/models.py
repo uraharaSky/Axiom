@@ -22,6 +22,14 @@ class SourceFile:
     path: Path
     language: str
 
+@dataclass
+class Function:
+    name: str
+    file: Path
+    line: int
+    parameters: list[Parameter] = field(default_factory = list)
+
+
 
 @dataclass
 class Project:
@@ -30,4 +38,5 @@ class Project:
     language: str
     framework: str | None = None
     files: list[SourceFile] = field(default_factory=list)
+    functions: list[Function] = field(default_factory = list)
     routes: list[Route] = field(default_factory=list)
