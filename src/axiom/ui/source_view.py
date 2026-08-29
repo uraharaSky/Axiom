@@ -1,8 +1,4 @@
 from rich.tree import Tree
-from axiom.scanner.models import SourceFile, Route
-
-
-from rich.tree import Tree
 
 from axiom.scanner.models import Route, SourceFile
 
@@ -10,58 +6,58 @@ from axiom.scanner.models import Route, SourceFile
 def build_source_tree(
         source_file: SourceFile,
         routes: list[Route],
+        path_label: str | None = None,
 ) -> Tree:
 
+    path = path_label or source_file.path.as_posix()
+
     tree = Tree(
-        f"[bold]{source_file.path}[/bold]"
+        f"[bold]{path}[/bold]"
     )
 
-    imports = tree.add(
-        "[cyan]Imports[/cyan]"
-    )
-
-    routes_tree = tree.add(
-        "[cyan]Routes[/cyan]"
-    )
-
-    for route in routes:
-
-        method_style = {
-            "GET": "green",
-            "POST": "yellow",
-            "PUT": "blue",
-            "PATCH": "magenta",
-            "DELETE": "red",
-        }.get(route.method, "white")
-
-        route_tree = routes_tree.add(
-            f"[{method_style}]{route.method}[/{method_style}] "
-            f"[white]{route.path}[/white]"
+    if routes:
+        routes_tree = tree.add(
+            "[cyan]Routes[/cyan]"
         )
 
-        route_tree.add(
-            f"[bright_cyan]Function:[/bright_cyan] "
-            f"[white]{route.function}()[/white]"
-        )
+        for route in routes:
 
-        if route.parameters:
+            method_style = {
+                "GET": "green",
+                "POST": "yellow",
+                "PUT": "blue",
+                "PATCH": "magenta",
+                "DELETE": "red",
+            }.get(route.method, "white")
 
-            parameters = route_tree.add(
-                "[cyan]Parameters[/cyan]"
+            route_tree = routes_tree.add(
+                f"[{method_style}]{route.method}[/{method_style}] "
+                f"[white]{route.path}[/white]"
             )
 
-            for parameter in route.parameters:
+            route_tree.add(
+                f"[bright_cyan]Function:[/bright_cyan] "
+                f"[white]{route.function}()[/white]"
+            )
 
-                parameter_type = (
-                    parameter.type
-                    if parameter.type is not None
-                    else "unknown"
+            if route.parameters:
+
+                parameters = route_tree.add(
+                    "[cyan]Parameters[/cyan]"
                 )
 
-                parameters.add(
-                    f"[white]{parameter.name}[/white]"
-                    f": "
-                    f"[dim cyan]{parameter_type}[/dim cyan]"
-                )
+                for parameter in route.parameters:
+
+                    parameter_type = (
+                        parameter.type
+                        if parameter.type is not None
+                        else "unknown"
+                    )
+
+                    parameters.add(
+                        f"[white]{parameter.name}[/white]"
+                        f": "
+                        f"[dim cyan]{parameter_type}[/dim cyan]"
+                    )
 
     return tree
