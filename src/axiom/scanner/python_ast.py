@@ -11,10 +11,25 @@ def parse_python_file(path: Path) -> ast.AST:
 
     source = path.read_text(encoding="utf-8")
 
-    tree = ast.parse(
-        source,
-        filename=str(path),
-    )
+    try:
+        tree = ast.parse(
+            source,
+            filename=str(path),
+        )
+
+    except SyntaxError as error:
+        line = error.lineno or 0
+        column = error.offset or 0
+
+        raise SyntaxError(
+            f"\n"
+            f"Parse Error\n"
+            f"\n"
+            f"File: {path}\n"
+            f"Line: {line}, Column: {column}\n"
+            f"\n"
+            f"{error.msg}"
+        ) from error
 
     return tree
 
