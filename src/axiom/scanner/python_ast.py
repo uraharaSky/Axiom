@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-from axiom.scanner.models import Route, Parameter, Function
+from axiom.scanner.models import Route, Parameter, Function, Import
 
 
 def parse_python_file(path: Path) -> ast.AST:
@@ -138,3 +138,38 @@ def discover_functions(
         )
 
     return functions
+
+def discover_imports(
+        tree: ast. AST,
+        file: Path,
+) -> list[Import]:
+
+    imports: list[Import] = []
+
+    for node in ast.walk(tree):
+
+        if isinstance(node, ast.Import):
+
+            for alias in node.names:
+                imports.append(
+                    Import(
+                        module = alias.name,
+                        file = file,
+                    )
+                )
+
+        elif isinstance(node, ast.ImportFrom):
+
+            names = [
+                alias.name
+                for alias in node.names
+            ]
+
+            imports.append(
+                Import(
+                    module = node.module or "",
+                    file = file,
+                    names = names,
+                )
+            )
+    return imports

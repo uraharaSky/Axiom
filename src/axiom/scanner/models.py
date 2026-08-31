@@ -1,4 +1,4 @@
-import pathlib
+from fastapi import APIRouter
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -29,6 +29,16 @@ class Function:
     line: int
     parameters: list[Parameter] = field(default_factory = list)
 
+@dataclass
+class Import:
+    module: str
+    file: Path
+    names: list[str] = field(default_factory = list)
+
+@dataclass
+class TestSurface:
+    route: Route
+    function: Function | None
 
 
 @dataclass
@@ -40,3 +50,4 @@ class Project:
     files: list[SourceFile] = field(default_factory=list)
     functions: list[Function] = field(default_factory = list)
     routes: list[Route] = field(default_factory=list)
+    imports: list[Import] = field(default_factory = list)
