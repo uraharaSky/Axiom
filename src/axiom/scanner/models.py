@@ -36,6 +36,14 @@ class Import:
     names: list[str] = field(default_factory = list)
 
 @dataclass
+class Class:
+    name: str
+    file: Path
+    line: int
+    methods: list[Function] = field(default_factory = list)
+
+
+@dataclass
 class TestSurface:
     route: Route
     function: Function | None
