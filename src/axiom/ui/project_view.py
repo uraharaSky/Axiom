@@ -2,7 +2,7 @@ from pathlib import Path
 
 from rich.tree import Tree
 
-from axiom.scanner.python.models import Project
+from axiom.scanner.models import Project
 from axiom.ui.source_view import build_source_tree
 
 

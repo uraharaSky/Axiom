@@ -1,5 +1,5 @@
 from pathlib import Path
-from axiom.scanner.python.models import SourceFile, Project
+from axiom.scanner.models import SourceFile, Project
 from axiom.scanner.python.python_ast import (
     discover_routes,
     parse_python_file,

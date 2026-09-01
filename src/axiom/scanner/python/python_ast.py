@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-from axiom.scanner.python.models import Route, Parameter, Function, Import, Class
+from axiom.scanner.models import Route, Parameter, Function, Import, Class
 
 
 def parse_python_file(path: Path) -> ast.AST:
