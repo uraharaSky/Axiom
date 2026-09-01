@@ -85,14 +85,32 @@ def discover_imports(
 
         for child in node.named_children:
 
-            if child.type == "import_clause":
+            if child.type != "import_clause":
+                continue
 
-                for imported in child.named_children:
+            for imported in child.named_children:
 
-                    if imported.type == "identifier":
-                        names.append(
-                            imported.text.decode("utf-8")
+                if imported.type == "identifier":
+
+                    names.append(
+                        imported.text.decode("utf-8")
+                    )
+
+                elif imported.type == "named_imports":
+
+                    for specifier in imported.named_children:
+
+                        if specifier.type != "import_specifier":
+                            continue
+
+                        name_node = specifier.child_by_field_name(
+                            "name"
                         )
+
+                        if name_node:
+                            names.append(
+                                name_node.text.decode("utf-8")
+                            )
 
         imports.append(
             Import(
