@@ -1,6 +1,6 @@
 from rich.tree import Tree
 
-from axiom.scanner.models import Route, SourceFile
+from axiom.scanner.python.models import Route, SourceFile
 
 
 def build_source_tree(

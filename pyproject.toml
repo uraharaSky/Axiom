@@ -85,6 +85,8 @@ dependencies = [
     "typer",
     "rich",
     "pillow",
+    "tree-sitter",
+    "tree-sitter-javascript",
 ]
 
 
