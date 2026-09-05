@@ -59,3 +59,4 @@ class Project:
     functions: list[Function] = field(default_factory = list)
     routes: list[Route] = field(default_factory=list)
     imports: list[Import] = field(default_factory = list)
+    classes: list[Class] = field(default_factory = list)

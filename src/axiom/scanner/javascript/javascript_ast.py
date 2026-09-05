@@ -138,13 +138,6 @@ def discover_classes(
         class_body = node.child_by_field_name("body")
 
         methods: list[Function] = []
-        #
-        # for child in class_body.named_children:
-        #
-        #     if child.type != "method_definition":
-        #         continue
-
-        # methods = []
 
         for child in class_body.named_children:
             if child.type != "method_definition":
@@ -182,5 +175,6 @@ def discover_classes(
                 methods=methods,
             )
         )
+
 
     return classes

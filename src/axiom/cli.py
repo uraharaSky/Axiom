@@ -5,7 +5,7 @@ from axiom.ui.welcome import show_welcome
 from pathlib import Path
 
 from axiom.ui.project_view import build_project_tree
-from axiom.scanner import (
+from axiom.scanner.project import (
     scan_project,
     project_parse,
 )
