@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -48,6 +48,12 @@ class TestSurface:
     route: Route
     function: Function | None
 
+@dataclass
+class FrameworkSignal:
+    name : str
+    language: str
+    files: list[Path]
+
 
 @dataclass
 class Project:
@@ -60,3 +66,4 @@ class Project:
     routes: list[Route] = field(default_factory=list)
     imports: list[Import] = field(default_factory = list)
     classes: list[Class] = field(default_factory = list)
+    frameworks: list[FrameworkSignal] = field(default_factory = list)
