@@ -27,6 +27,7 @@ class Function:
     name: str
     file: Path
     line: int
+    end_line: int
     parameters: list[Parameter] = field(default_factory = list)
 
 @dataclass
@@ -40,6 +41,7 @@ class Class:
     name: str
     file: Path
     line: int
+    end_line: int
     methods: list[Function] = field(default_factory = list)
 
 
