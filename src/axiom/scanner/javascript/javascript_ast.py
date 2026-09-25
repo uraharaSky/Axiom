@@ -57,6 +57,7 @@ def discover_functions(
                 name=name_node.text.decode("utf-8"),
                 file=file,
                 line=node.start_point[0] + 1,
+                end_line= node.end_point[0] + 1,
                 parameters=parameters,
             )
         )
@@ -163,6 +164,7 @@ def discover_classes(
                     name=method_name_node.text.decode("utf-8"),
                     file=file,
                     line=child.start_point[0] + 1,
+                    end_line= node.end_point[0] + 1,
                     parameters=parameters,
                 )
             )
@@ -172,6 +174,7 @@ def discover_classes(
                 name=node.child_by_field_name("name").text.decode("utf-8"),
                 file=file,
                 line=node.start_point[0] + 1,
+                end_line= node.end_point[0] + 1,
                 methods=methods,
             )
         )

@@ -133,6 +133,7 @@ def discover_functions(
                 name=node.name,
                 file=file,
                 line=node.lineno,
+                end_line=node.end_lineno,
                 parameters=parameters,
             )
         )
@@ -214,6 +215,7 @@ def discover_classes(
                     name=child.name,
                     file=file,
                     line=child.lineno,
+                    end_line=node.end_lineno,
                     parameters=parameters,
                 )
             )
@@ -223,6 +225,7 @@ def discover_classes(
                 name=node.name,
                 file=file,
                 line=node.lineno,
+                end_line=node.end_lineno,
                 methods=methods,
             )
         )
