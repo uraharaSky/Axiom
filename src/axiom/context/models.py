@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+
+
+
 @dataclass
 class RetrievalUnit:
     id: str
@@ -36,4 +39,9 @@ class ExpansionRound:
     discovered_units: list[RetrievalUnit]
     visited: set[str]
 
-
+# @dataclass
+# class Relationship:
+#     kind: RelationshipKind
+#     name: str
+#     source: RetrievalUnit
+#     module: str | None = None

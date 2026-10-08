@@ -17,6 +17,7 @@ class Relationship:
     kind: RelationshipKind
     name: str
     source: RetrievalUnit
+    module: str | None = None
 
 def analyze_relationships(
     unit: RetrievalUnit,
@@ -89,5 +90,60 @@ def analyze_relationships(
                     )
                 )
 
+    relationships.extend(
+        _discover_module_references(
+            unit_tree,
+            file_tree,
+            unit,
+        )
+    )
+
     return relationships
 
+def _discover_module_references(
+    unit_tree: ast.AST,
+    file_tree: ast.AST,
+    unit: RetrievalUnit,
+) -> list[Relationship]:
+
+    imports: dict[str, str] = {}
+
+    for node in ast.walk(file_tree):
+
+        if isinstance(node, ast.Import):
+
+            for alias in node.names:
+                local_name = alias.asname or alias.name.split(".")[0]
+                imports[local_name] = alias.name
+
+        elif isinstance(node, ast.ImportFrom):
+
+            # These are symbol imports, not module imports.
+            # They are already handled by IMPORT relationships.
+            continue
+
+    relationships: list[Relationship] = []
+
+    for node in ast.walk(unit_tree):
+
+        if not isinstance(node, ast.Attribute):
+            continue
+
+        if not isinstance(node.value, ast.Name):
+            continue
+
+        module_alias = node.value.id
+
+        if module_alias not in imports:
+            continue
+
+        relationships.append(
+            Relationship(
+                kind=RelationshipKind.IMPORT,
+                name=node.attr,
+                source=unit,
+                module=imports[module_alias],
+            )
+        )
+
+    return relationships
