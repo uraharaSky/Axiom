@@ -1,23 +1,29 @@
 import requests
-from axiom.llm.schemas import LLMRequest, LLMResponse
+
 from axiom.llm.interface import LLMInterface
+from axiom.llm.schemas import LLMRequest, LLMResponse
 
 
-class OllamaClient:
+class OllamaClient(LLMInterface):
+
     def __init__(
-            self,
-            host: str = "http://localhost:11434",
-            model: str = "llama3:latest",
+        self,
+        host: str = "http://localhost:11434",
+        model: str = "llama3:latest",
     ):
         self.host = host
         self.model = model
 
-    def generate(self, request: LLMRequest ) -> LLMResponse:
+    def generate(
+        self,
+        request: LLMRequest,
+    ) -> LLMResponse:
+
         model = request.model or self.model
 
         response = requests.post(
             f"{self.host}/api/generate",
-            json = {
+            json={
                 "model": model,
                 "prompt": request.prompt,
                 "stream": False,
@@ -29,6 +35,6 @@ class OllamaClient:
         data = response.json()
 
         return LLMResponse(
-            content = data["response"],
-            model = data["model"],
+            content=data["response"],
+            model=data["model"],
         )
