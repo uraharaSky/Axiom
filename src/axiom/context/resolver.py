@@ -87,13 +87,32 @@ def _resolve_classes(
     ]
 
 
+def _resolve_callable(
+        name: str,
+        project: Project,
+        module: str | None = None,
+) -> list[RetrievalUnit]:
+
+    return (
+        _resolve_functions(
+            name,
+            project,
+            module,
+        )
+        + _resolve_classes(
+            name,
+            project,
+            module,
+        )
+    )
+
 def resolve_relationship(
     relationship: Relationship,
     project: Project,
 ) -> list[RetrievalUnit]:
 
     if relationship.kind == RelationshipKind.FUNCTION_CALL:
-        return _resolve_functions(
+        return _resolve_callable(
             relationship.name,
             project,
         )
@@ -105,30 +124,10 @@ def resolve_relationship(
         )
 
     if relationship.kind == RelationshipKind.IMPORT:
-
-        if relationship.module is None:
-            return (
-                _resolve_functions(
-                    relationship.name,
-                    project,
-                )
-                + _resolve_classes(
-                    relationship.name,
-                    project,
-                )
-            )
-
-        return (
-            _resolve_functions(
-                relationship.name,
-                project,
-                relationship.module,
-            )
-            + _resolve_classes(
-                relationship.name,
-                project,
-                relationship.module,
-            )
+        return _resolve_callable(
+            relationship.name,
+            project,
+            relationship.module,
         )
 
     return []
