@@ -81,12 +81,19 @@ def analyze_relationships(
 
         elif isinstance(node, ast.ImportFrom):
 
+            if node.module is None:
+                continue
+
             for alias in node.names:
+
+                local_name = alias.asname or alias.name
+
                 relationships.append(
                     Relationship(
                         kind=RelationshipKind.IMPORT,
-                        name=alias.name,
+                        name=local_name,
                         source=unit,
+                        module = node.module,
                     )
                 )
 
