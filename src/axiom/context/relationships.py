@@ -105,7 +105,7 @@ def analyze_relationships(
         )
     )
 
-    return relationships
+    return _deduplicate_relationships(relationships)
 
 def _discover_module_references(
     unit_tree: ast.AST,
@@ -154,3 +154,26 @@ def _discover_module_references(
         )
 
     return relationships
+
+def _deduplicate_relationships(
+        relationships: list[Relationship],
+) -> list[Relationship]:
+
+    seen: set[tuple] = set()
+    unique: list[Relationship] = []
+
+    for relationship in relationships:
+
+        key = (
+            relationship.kind,
+            relationship.name,
+            relationship.module,
+        )
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+        unique.append(relationship)
+
+    return unique
