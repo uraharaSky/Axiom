@@ -47,16 +47,7 @@ def analyze_relationships(
         if isinstance(node.func, ast.Name):
             name = node.func.id
 
-            is_class = any(
-                cls.name == name
-                for cls in project.classes
-            )
-
-            kind = (
-                RelationshipKind.CLASS_REFERENCE
-                if is_class
-                else RelationshipKind.FUNCTION_CALL
-            )
+            kind = RelationshipKind.FUNCTION_CALL
 
             relationships.append(
                 Relationship(
