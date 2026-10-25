@@ -1,5 +1,6 @@
 from axiom.context.models import ExpansionBudget, RetrievalUnit
-
+from axiom.context.relationships import analyze_relationships
+from axiom.context.resolver import resolve_relationship
 
 def expand(
         initial_units: list[RetrievalUnit],
