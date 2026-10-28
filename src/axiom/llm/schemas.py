@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from axiom.context.models import RetrievalUnit
+
 
 
 @dataclass
@@ -11,3 +13,4 @@ class LLMRequest:
 class LLMResponse:
     content: str
     model: str | None = None
+

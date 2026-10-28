@@ -1,7 +1,10 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-
+if TYPE_CHECKING:
+    from axiom.context.relationships import Relationship
 
 
 @dataclass
@@ -45,3 +48,11 @@ class ExpansionRound:
 #     name: str
 #     source: RetrievalUnit
 #     module: str | None = None
+
+@dataclass
+class TestGenerationContext:
+    __test__ = False
+    target: RetrievalUnit
+    source: str
+    related_units: list[RetrievalUnit]
+    relationships: list[Relationship]
