@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-from axiom.context.models import RetrievalUnit
-
 
 
 @dataclass
