@@ -17,7 +17,7 @@ class SpecificationValidationError(Exception):
 
 class SpecificationValidator:
 
-    def validate(self, data: dict[str, Any]) -> TestSpecification:
+    def validate(self, data: Any) -> TestSpecification:
         self._validate_top_level(data)
 
         test_cases = [
@@ -33,39 +33,46 @@ class SpecificationValidator:
         )
 
     def _validate_top_level(self, data: Any) -> None:
-        if not isinstance(data, dict):
-            raise SpecificationValidationError(
-                "Test specification must be a dictionary"
-            )
+        self._validate_dictionary(data, "Test specification")
 
-        required_fields = {
-            "target": str,
-            "objective": str,
-            "assumptions": list,
-            "test_cases": list,
-        }
+        self._validate_required_field(
+            data,
+            "target",
+            str,
+        )
 
-        for field, expected_type in required_fields.items():
-            if field not in data:
-                raise SpecificationValidationError(
-                    f"Missing required field: {field}"
-                )
+        self._validate_required_field(
+            data,
+            "objective",
+            str,
+        )
 
-            if not isinstance(data[field], expected_type):
-                raise SpecificationValidationError(
-                    f"Field '{field}' must be of type "
-                    f"{expected_type.__name__}"
-                )
+        self._validate_required_field(
+            data,
+            "assumptions",
+            list,
+        )
 
-        if not data["target"].strip():
-            raise SpecificationValidationError(
-                "Field 'target' cannot be empty"
-            )
+        self._validate_required_field(
+            data,
+            "test_cases",
+            list,
+        )
 
-        if not data["objective"].strip():
-            raise SpecificationValidationError(
-                "Field 'objective' cannot be empty"
-            )
+        self._validate_non_empty_string(
+            data["target"],
+            "target",
+        )
+
+        self._validate_non_empty_string(
+            data["objective"],
+            "objective",
+        )
+
+        self._validate_string_list(
+            data["assumptions"],
+            "assumptions",
+        )
 
     def _validate_test_case(
         self,
@@ -73,69 +80,63 @@ class SpecificationValidator:
         index: int,
     ) -> TestCase:
 
-        prefix = f"test_cases[{index}]"
+        field = f"test_cases[{index}]"
 
-        if not isinstance(data, dict):
-            raise SpecificationValidationError(
-                f"{prefix} must be a dictionary"
+        self._validate_dictionary(data, field)
+
+        required_fields = {
+            "name": str,
+            "category": str,
+            "objective": str,
+            "preconditions": list,
+            "inputs": dict,
+            "expected": dict,
+            "priority": str,
+        }
+
+        for name, expected_type in required_fields.items():
+            self._validate_required_field(
+                data,
+                name,
+                expected_type,
+                parent=field,
             )
 
-        required_fields = [
-            "name",
-            "category",
-            "objective",
-            "preconditions",
-            "inputs",
-            "expected",
-            "priority",
-        ]
-
-        for field in required_fields:
-            if field not in data:
-                raise SpecificationValidationError(
-                    f"Missing required field: {prefix}.{field}"
-                )
-
-        self._validate_string(
+        self._validate_non_empty_string(
             data["name"],
-            f"{prefix}.name",
+            f"{field}.name",
         )
 
-        self._validate_string(
+        self._validate_non_empty_string(
             data["objective"],
-            f"{prefix}.objective",
-        )
-
-        self._validate_list(
-            data["preconditions"],
-            f"{prefix}.preconditions",
+            f"{field}.objective",
         )
 
         self._validate_string_list(
             data["preconditions"],
-            f"{prefix}.preconditions",
+            f"{field}.preconditions",
         )
 
         category = self._validate_enum(
             data["category"],
             TestCategory,
-            f"{prefix}.category",
+            f"{field}.category",
         )
 
         priority = self._validate_enum(
             data["priority"],
             TestPriority,
-            f"{prefix}.priority",
+            f"{field}.priority",
         )
 
         inputs = self._validate_inputs(
             data["inputs"],
-            f"{prefix}.inputs",
+            f"{field}.inputs",
         )
 
         expected = self._validate_expected(
             data["expected"],
-            f"{prefix}.expected",
+            f"{field}.expected",
         )
 
         return TestCase(
@@ -154,29 +155,21 @@ class SpecificationValidator:
         field: str,
     ) -> TestInputs:
 
-        if not isinstance(data, dict):
-            raise SpecificationValidationError(
-                f"Field '{field}' must be a dictionary"
-            )
+        self._validate_dictionary(data, field)
 
-        required_fields = ["args", "kwargs"]
-
-        for required_field in required_fields:
-            if required_field not in data:
-                raise SpecificationValidationError(
-                    f"Missing required field: "
-                    f"{field}.{required_field}"
-                )
-
-        self._validate_list(
-            data["args"],
-            f"{field}.args",
+        self._validate_required_field(
+            data,
+            "args",
+            list,
+            parent=field,
         )
 
-        if not isinstance(data["kwargs"], dict):
-            raise SpecificationValidationError(
-                f"Field '{field}.kwargs' must be a dictionary"
-            )
+        self._validate_required_field(
+            data,
+            "kwargs",
+            dict,
+            parent=field,
+        )
 
         return TestInputs(
             args=data["args"],
@@ -189,19 +182,19 @@ class SpecificationValidator:
         field: str,
     ) -> ExpectedBehavior:
 
-        if not isinstance(data, dict):
+        self._validate_dictionary(data, field)
+
+        self._validate_required_field(
+            data,
+            "type",
+            str,
+            parent=field,
+        )
+
+        if "value" not in data:
             raise SpecificationValidationError(
-                f"Field '{field}' must be a dictionary"
+                f"Missing required field: {field}.value"
             )
-
-        required_fields = ["type", "value"]
-
-        for required_field in required_fields:
-            if required_field not in data:
-                raise SpecificationValidationError(
-                    f"Missing required field: "
-                    f"{field}.{required_field}"
-                )
 
         expected_type = self._validate_enum(
             data["type"],
@@ -239,7 +232,39 @@ class SpecificationValidator:
                 f"{valid_values}"
             )
 
-    def _validate_string(
+    def _validate_required_field(
+        self,
+        data: dict[str, Any],
+        field: str,
+        expected_type: type,
+        parent: str | None = None,
+    ) -> None:
+
+        location = f"{parent}.{field}" if parent else field
+
+        if field not in data:
+            raise SpecificationValidationError(
+                f"Missing required field: {location}"
+            )
+
+        if not isinstance(data[field], expected_type):
+            raise SpecificationValidationError(
+                f"Field '{location}' must be of type "
+                f"{expected_type.__name__}"
+            )
+
+    def _validate_dictionary(
+        self,
+        value: Any,
+        field: str,
+    ) -> None:
+
+        if not isinstance(value, dict):
+            raise SpecificationValidationError(
+                f"{field} must be a dictionary"
+            )
+
+    def _validate_non_empty_string(
         self,
         value: Any,
         field: str,
@@ -255,32 +280,26 @@ class SpecificationValidator:
                 f"Field '{field}' cannot be empty"
             )
 
-    def _validate_list(
+    def _validate_string_list(
         self,
-        value: Any,
+        values: Any,
         field: str,
     ) -> None:
 
-        if not isinstance(value, list):
+        if not isinstance(values, list):
             raise SpecificationValidationError(
                 f"Field '{field}' must be a list"
             )
 
-    def _validate_string_list(
-        self,
-        values: list[Any],
-        field: str,
-    ) -> None:
-
         for index, value in enumerate(values):
+            item_field = f"{field}[{index}]"
+
             if not isinstance(value, str):
                 raise SpecificationValidationError(
-                    f"Field '{field}[{index}]' "
-                    f"must be a string"
+                    f"Field '{item_field}' must be a string"
                 )
 
             if not value.strip():
                 raise SpecificationValidationError(
-                    f"Field '{field}[{index}]' "
-                    f"cannot be empty"
+                    f"Field '{item_field}' cannot be empty"
                 )

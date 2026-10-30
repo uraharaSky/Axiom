@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Any
 
 
-class TestCategory(Enum):
+class TestCategory(str, Enum):
     __test__ = False
 
     HAPPY_PATH = "happy_path"
@@ -13,14 +13,14 @@ class TestCategory(Enum):
     REGRESSION = "regression"
 
 
-class ExpectedType(Enum):
+class ExpectedType(str, Enum):
     __test__ = False
 
     RETURN = "return"
     EXCEPTION = "exception"
 
 
-class TestPriority(Enum):
+class TestPriority(str, Enum):
     __test__ = False
 
     HIGH = "high"
