@@ -52,7 +52,21 @@ class ExpansionRound:
 @dataclass
 class TestGenerationContext:
     __test__ = False
+
     target: RetrievalUnit
     source: str
     related_units: list[RetrievalUnit]
     relationships: list[Relationship]
+
+# @dataclass
+# class TestCase:
+#     name: str
+#     description: str
+#     inputs: dict
+#     expected_behaviour: str
+#
+# @dataclass
+# class TestSpecification:
+#     target: str
+#     summary: str
+#     test_cases: list[TestCase]
